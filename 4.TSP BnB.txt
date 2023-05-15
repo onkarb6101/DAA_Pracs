@@ -1,0 +1,280 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+
+public class TSPBranchAndBound {
+
+    private final int[][] graph;
+    private final int n;
+    private boolean[] visited;
+    private int currentCost;
+    private int bestCost;
+    private List<Integer> currentPath;
+    private List<Integer> bestPath;
+
+    public TSPBranchAndBound(int[][] graph) {
+        this.graph = graph;
+        this.n = graph.length;
+        this.visited = new boolean[n];
+        this.currentCost = 0;
+        this.bestCost = Integer.MAX_VALUE;
+        this.currentPath = new ArrayList<>();
+        this.bestPath = new ArrayList<>();
+    }
+
+    public void solve() {
+        visited[0] = true;
+        currentPath.add(0);
+
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.add(new Node(0, currentCost, currentPath));
+
+        while (!pq.isEmpty()) {
+            Node node = pq.poll();
+
+            if (node.level == n - 1) {
+                node.path.add(0);
+                int cost = node.cost + graph[node.path.get(n - 2)][0];
+                if (cost < bestCost) {
+                    bestCost = cost;
+                    bestPath = new ArrayList<>(node.path);
+                }
+                continue;
+            }
+
+            int currentVertex = node.path.get(node.level);
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    int newCost = node.cost + graph[currentVertex][i];
+                    if (newCost < bestCost) {
+                        List<Integer> newPath = new ArrayList<>(node.path);
+                        newPath.add(i);
+                        pq.add(new Node(node.level + 1, newCost, newPath));
+                    }
+                }
+            }
+        }
+    }
+
+    public void printSolution() {
+        System.out.println("Optimal Path: " + bestPath.toString());
+        System.out.println("Optimal Cost: " + bestCost);
+    }
+
+    private static class Node implements Comparable<Node> {
+        int level;
+        int cost;
+        List<Integer> path;
+
+        public Node(int level, int cost, List<Integer> path) {
+            this.level = level;
+            this.cost = cost;
+            this.path = path;
+        }
+
+        @Override
+        public int compareTo(Node o) {
+            return Integer.compare(cost, o.cost);
+        }
+    }
+
+    public static void main(String[] args) {
+        int[][] graph = {
+                { 0, 10, 15, 20 },
+                { 10, 0, 35, 25 },
+                { 15, 35, 0, 30 },
+                { 20, 25, 30, 0 }
+        };
+        TSPBranchAndBound tsp = new TSPBranchAndBound(graph);
+        tsp.solve();
+        tsp.printSolution();
+    }
+}
+
+
+CPP
+
+#include <iostream>
+#include <vector>
+#include <limits>
+#include <algorithm>
+
+const int INF = std::numeric_limits<int>::max();
+
+// Function to calculate the cost of a given path
+int calculateCost(const std::vector<std::vector<int>>& graph, const std::vector<int>& path) {
+    int cost = 0;
+    int n = graph.size();
+
+    for (int i = 0; i < n - 1; i++) {
+        int src = path[i];
+        int dest = path[i + 1];
+
+        // If there is no edge between two vertices, return infinity
+        if (graph[src][dest] == 0) {
+            return INF;
+        }
+
+        cost += graph[src][dest];
+    }
+
+    // Add the cost of returning back to the starting vertex
+    int lastVertex = path[n - 1];
+    int startingVertex = path[0];
+
+    if (graph[lastVertex][startingVertex] == 0) {
+        return INF;
+    }
+
+    cost += graph[lastVertex][startingVertex];
+
+    return cost;
+}
+
+// Recursive function to find the minimum cost using Branch and Bound
+void tspBranchAndBound(const std::vector<std::vector<int>>& graph, std::vector<int>& path,
+                       std::vector<bool>& visited, int currCost, int& minCost) {
+    int n = graph.size();
+    int lastVertex = path[path.size() - 1];
+
+    // If all vertices have been visited
+    if (path.size() == n) {
+        int cost = currCost + graph[lastVertex][path[0]];
+        minCost = std::min(minCost, cost);
+        return;
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            int src = lastVertex;
+            int dest = i;
+
+            // If there is no edge between two vertices, skip
+            if (graph[src][dest] == 0) {
+                continue;
+            }
+
+            visited[i] = true;
+            path.push_back(i);
+
+            int newCost = currCost + graph[src][dest];
+
+            // Pruning the search tree if the current cost exceeds the minimum cost found so far
+            if (newCost < minCost) {
+                tspBranchAndBound(graph, path, visited, newCost, minCost);
+            }
+
+            visited[i] = false;
+            path.pop_back();
+        }
+    }
+}
+
+// Function to find the minimum cost using Branch and Bound
+int tspBranchAndBound(const std::vector<std::vector<int>>& graph) {
+    int n = graph.size();
+    int minCost = INF;
+
+    // Start from vertex 0
+    std::vector<int> path;
+    path.push_back(0);
+
+    std::vector<bool> visited(n, false);
+    visited[0] = true;
+
+    tspBranchAndBound(graph, path, visited, 0, minCost);
+
+    return minCost;
+}
+
+int main() {
+    std::vector<std::vector<int>> graph = {
+        {0, 10, 15, 20},
+        {10, 0, 35, 25},
+        {15, 35, 0, 30},
+        {20, 25, 30, 0}
+    };
+
+    int minCost = tspBranchAndBound(graph);
+
+    std::cout << "Minimum cost of TSP: " << minCost << std::endl;
+
+    return 0;
+}
+
+
+
+Python 
+
+
+import numpy as np
+from itertools import permutations
+
+def tsp_branch_and_bound(graph):
+    num_nodes = len(graph)
+    min_cost = np.inf
+    best_path = []
+
+    def calculate_cost(path):
+        cost = 0
+        for i in range(num_nodes - 1):
+            cost += graph[path[i]][path[i+1]]
+        cost += graph[path[-1]][path[0]]
+        return cost
+
+    def branch_and_bound(path, cost):
+        nonlocal min_cost, best_path
+
+        if len(path) == num_nodes:
+            cost += graph[path[-1]][path[0]]
+            if cost < min_cost:
+                min_cost = cost
+                best_path = path[:]
+            return
+
+        for node in range(num_nodes):
+            if node not in path:
+                new_cost = cost + graph[path[-1]][node]
+                if new_cost < min_cost:
+                    branch_and_bound(path + [node], new_cost)
+
+    for start_node in range(num_nodes):
+        branch_and_bound([start_node], 0)
+
+    return best_path, min_cost
+
+
+# User input for graph
+num_nodes = int(input("Enter the number of nodes: "))
+
+graph = np.zeros((num_nodes, num_nodes))
+print("Enter the adjacency matrix (separate values by space):")
+for i in range(num_nodes):
+    row = list(map(int, input().split()))
+    graph[i] = row
+
+best_path, best_cost = tsp_branch_and_bound(graph)
+print("Best path:", best_path)
+print("Best cost:", best_cost)
+
+
+
+Logistics and transportation: In the logistics and transportation industry,
+the TSP is used to optimize delivery routes for trucks, buses, and other vehicles.
+By finding the shortest possible route, transportation companies can reduce fuel costs,
+ travel time, and increase efficiency.
+
+Manufacturing: In the manufacturing industry, the TSP is used to optimize
+ production schedules by finding the shortest route for robots or workers
+ to visit different workstations. This can improve production efficiency,
+ reduce time and costs, and increase productivity.
+
+DNA sequencing: In bioinformatics, the TSP is used to determine
+ the order in which DNA fragments should be assembled to reconstruct a genome.
+ By finding the shortest possible route, scientists can reduce the cost and time required for sequencing and assembly.
+
+Network routing: In computer networking, the TSP is used to
+ optimize the routing of packets across a network. By finding
+ the shortest possible route, network performance can be improved, and data transfer can be made more efficient.
+
+In the worst case scenario, where all possible permutations of cities need to be considered, the time complexity of branch and bound for TSP is O(n!). This is because there are n! (n factorial) possible permutations of cities to explore

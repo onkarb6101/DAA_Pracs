@@ -1,0 +1,142 @@
+Java
+
+class Knapsack {
+
+    public static int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
+
+    static int knapsack(int W, int wt[], int val[], int n) {
+
+        int i, w;
+        int K[][] = new int[n + 1][W + 1];
+
+        for (i = 0; i <= n; i++) {
+            for (w = 0; w <= W; w++) {
+                if (i == 0 || W == 0)
+                    K[i][w] = 0;
+                else if (wt[i - 1] <= w)
+                    K[i][w] = max(val[i - 1] + K[i - 1][w - wt[i - 1]], K[i - 1][w]);
+                else
+                    K[i][w] = K[i - 1][w];
+            }
+        }
+
+        return K[n][W];
+    }
+
+    public static void main(String args[]) {
+        int profit[] = new int[] { 2, 3, 1, 4 };
+        int weight[] = new int[] { 3, 4, 6, 5 };
+        int W = 8;
+        int n = profit.length;
+
+        System.out.println(knapsack(W, weight, profit, n));
+    }
+}
+
+
+
+CPP
+
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int solve(int n, int m, const vector<int>& weight, const vector<int>& profit) {
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1));
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j <= m; j++) {
+            if (i == 0 || j == 0) {
+                dp[i][j] = 0;
+            }
+            else if (weight[i - 1] > j) {
+                dp[i][j] = dp[i - 1][j];
+            }
+            else {
+                dp[i][j] = max(dp[i - 1][j], profit[i - 1] + dp[i - 1][j - weight[i - 1]]);
+            }
+        }
+    }
+    // Printing the dynamic programming table
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j <= m; j++) {
+            cout << dp[i][j] << " ";
+        }
+        cout << endl;
+    }
+    return dp[n][m];
+}
+
+int main() {
+    vector<int> profit = {60, 100, 120, 160, 250, 420, 490};
+    vector<int> weight = {10, 20, 30, 40, 50, 60, 70};
+    int n = weight.size();
+    int m = 90;
+    int ans = solve(n, m, weight, profit);
+    cout << "The maximum profit is: " << ans << endl;
+    return 0;
+}
+
+
+
+
+Python
+
+
+def knapsack_dynamic_programming(weights, values, capacity):
+    num_items = len(weights)
+
+    # Create a table to store the maximum values for each capacity and item combination
+    dp = [[0] * (capacity + 1) for _ in range(num_items + 1)]
+
+    # Dynamic Programming loop
+    for i in range(1, num_items + 1):
+        for j in range(1, capacity + 1):
+            if weights[i - 1] > j:
+                # Current item cannot be included as it exceeds the capacity
+                dp[i][j] = dp[i - 1][j]
+            else:
+                # Choose the maximum value between including and excluding the current item
+                dp[i][j] = max(dp[i - 1][j], values[i - 1] + dp[i - 1][j - weights[i - 1]])
+
+    # Find the selected items
+    selected_items = []
+    i = num_items
+    j = capacity
+    while i > 0 and j > 0:
+        if dp[i][j] != dp[i - 1][j]:
+            selected_items.append(i - 1)
+            j -= weights[i - 1]
+        i -= 1
+
+    # Reverse the selected items list to get the correct order
+    selected_items.reverse()
+
+    return dp[num_items][capacity], selected_items
+
+# User input for weights, values, and capacity
+weights = list(map(int, input("Enter the weights of the items (separated by space): ").split()))
+values = list(map(int, input("Enter the values of the items (separated by space): ").split()))
+capacity = int(input("Enter the maximum capacity of the knapsack: "))
+
+max_value, selected_items = knapsack_dynamic_programming(weights, values, capacity)
+print("Maximum value:", max_value)
+print("Selected items:", selected_items)
+
+
+KNAPSACK --------------------------------------------------
+
+Resource Allocation: The knapsack problem is commonly used in resource allocation scenarios, such as selecting the most valuable set of projects to undertake within a limited budget or choosing the most profitable investments with a limited amount of capital.
+
+Portfolio Optimization: In finance, the knapsack problem can be applied to portfolio optimization, where an investor needs to select a combination of financial assets (stocks, bonds, etc.) that maximizes the expected return while respecting constraints on the total investment amount or risk tolerance.
+
+Cutting Stock Problem: In manufacturing and material optimization, the knapsack problem can be used to determine the most efficient way to cut raw materials, such as rolls of fabric or metal sheets, to minimize waste while fulfilling specific orders or production requirements.
+
+Scheduling and Time Management: The knapsack problem can be applied to scheduling tasks or activities with limited resources and time. For example, an individual or organization may need to decide which tasks to prioritize within a fixed time frame, taking into account their importance and time required.
+
+
+In the worst case, the time complexity of the knapsack problem with backtracking is exponential, specifically O(2^N), where N is the number of items to choose from. This is because the backtracking algorithm explores all possible combinations of items, which grows exponentially with the number of items.
+
+The reason for this exponential complexity is that at each step, the algorithm needs to make a decision to either include or exclude an item from the knapsack. Since there are two choices for each item, and there are N items in total, the total number of possible combinations to explore is 2^N.

@@ -1,0 +1,94 @@
+import java.util.Random;
+
+public class MatrixMultiplication {
+	static final int MAX = 4;
+	static final int MAX_THREAD = 4;
+	static int[][] matA = new int[MAX][MAX];
+	static int[][] matB = new int[MAX][MAX];
+	static int[][] matC = new int[MAX][MAX];
+	static int step_i = 0;
+
+	static class Worker implements Runnable {
+		int i;
+
+		Worker(int i) {
+			this.i = i;
+		}
+
+		@Override
+		public void run() {
+			for (int j = 0; j < MAX; j++) {
+				for (int k = 0; k < MAX; k++) {
+					matC[i][j] += matA[i][k] * matB[k][j];
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Random rand = new Random();
+
+		// Generating random values in matA and matB
+		for (int i = 0; i < MAX; i++) {
+			for (int j = 0; j < MAX; j++) {
+				matA[i][j] = rand.nextInt(10);
+				matB[i][j] = rand.nextInt(10);
+			}
+		}
+
+		// Displaying matA
+		System.out.println("Matrix A");
+		for (int i = 0; i < MAX; i++) {
+			for (int j = 0; j < MAX; j++) {
+				System.out.print(matA[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+		// Displaying matB
+		System.out.println("Matrix B");
+		for (int i = 0; i < MAX; i++) {
+			for (int j = 0; j < MAX; j++) {
+				System.out.print(matB[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+		// declaring four threads
+		Thread[] threads = new Thread[MAX_THREAD];
+
+		// Creating four threads, each evaluating its own part
+		for (int i = 0; i < MAX_THREAD; i++) {
+			threads[i] = new Thread(new Worker(step_i++));
+			threads[i].start();
+		}
+
+		// joining and waiting for all threads to complete
+		for (int i = 0; i < MAX_THREAD; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Displaying the result matrix
+		System.out.println("Multiplication of A and B");
+		for (int i = 0; i < MAX; i++) {
+			for (int j = 0; j < MAX; j++) {
+				System.out.print(matC[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+}
+
+Scientific Computing: In scientific simulations and computations, matrix operations are prevalent, such as solving systems of linear equations, performing eigenvalue calculations, and numerical optimization. By utilizing threaded matrix multiplication, these computations can be parallelized to take advantage of multicore processors or distributed computing environments, reducing the overall computation time.
+
+Image and Signal Processing: Many image and signal processing algorithms rely on matrix operations, such as convolution, filtering, and transformation. By employing threaded matrix multiplication, these operations can be performed concurrently, enabling real-time or faster processing of images, audio signals, and video streams.
+
+Machine Learning and Data Analytics: Matrix operations form the backbone of many machine learning algorithms, such as matrix factorization, regression, clustering, and neural networks. Threaded matrix multiplication can accelerate the training and inference processes by parallelizing the computation across multiple cores or distributed computing resources, enabling faster model training and prediction.
+
+Computer Graphics and Rendering: Graphics rendering involves complex transformations, projections, and shading computations that can be expressed as matrix operations. By utilizing threaded matrix multiplication, these computations can be parallelized to improve the rendering speed and quality, enabling real-time rendering of complex scenes and visual effects.
+
+In a straightforward sequential matrix multiplication algorithm (without threading), the time complexity is O(N^3), where N is the size of the matrices. This is because, for each element in the resulting matrix, it requires N multiplications and N-1 additions, and there are N^2 elements in the resulting matrix.

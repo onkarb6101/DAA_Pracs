@@ -1,0 +1,181 @@
+Java
+
+//import java.lang.*;
+import java.util.*;
+
+public class Quicksort {
+    public static int partition(int arr[], int low, int high) {
+        // select last element as pivot
+        int pivot = arr[high];
+        // accepts smaller elements then pivot
+        int i = low - 1;
+
+        // traversing
+        for (int j = low; j < high; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                // swap
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        i++;
+        int temp = arr[i];
+        arr[i] = pivot;
+        arr[high] = temp;
+        // pivot index after partition
+        return i;
+    }
+
+    public static void quicksort(int arr[], int low, int high) {
+        if (low < high) {
+            int pidx = partition(arr, low, high);
+
+            // smaller elements than pivot
+            quicksort(arr, low, pidx - 1);
+            // larger elements than pivot
+            quicksort(arr, pidx + 1, high);
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sobj = new Scanner(System.in);
+        System.out.println("Enter the numbers to be sorted (Space-Separated)");
+        String str = sobj.nextLine();
+        String srr[] = str.split(" ");
+        int arr[] = new int[srr.length];
+
+        for (int i = 0; i < srr.length; i++) {
+            arr[i] = Integer.parseInt(srr[i]);
+        }
+
+        quicksort(arr, 0, arr.length - 1);
+
+        for (int i = 0; i < srr.length; i++) {
+            System.out.print(arr[i] + " ");
+        }
+
+    }
+}
+
+
+
+
+CPP
+
+#include <iostream>
+#include <vector>
+
+// Partition the array and return the pivot index
+int partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high];  // Choosing the last element as the pivot
+    int i = low - 1;  // Index of the smaller element
+
+    for (int j = low; j <= high - 1; j++) {
+        // If the current element is smaller than or equal to the pivot
+        if (arr[j] <= pivot) {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+
+    // Move the pivot element to its correct position
+    std::swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+// Recursive function to perform QuickSort
+void quickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        // Partition the array
+        int pivotIndex = partition(arr, low, high);
+
+        // Recursively sort the sub-arrays
+        quickSort(arr, low, pivotIndex - 1);
+        quickSort(arr, pivotIndex + 1, high);
+    }
+}
+
+// Utility function to print an array
+void printArray(const std::vector<int>& arr) {
+    for (int num : arr) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> arr = {9, 5, 1, 8, 2, 7, 3};
+    int n = arr.size();
+
+    std::cout << "Original array: ";
+    printArray(arr);
+
+    quickSort(arr, 0, n - 1);
+
+    std::cout << "Sorted array: ";
+    printArray(arr);
+
+    return 0;
+}
+
+
+
+Python
+
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+
+def quick_sort(arr, low, high):
+    if low < high:
+        pivot_index = partition(arr, low, high)
+        quick_sort(arr, low, pivot_index - 1)
+        quick_sort(arr, pivot_index + 1, high)
+
+# User input for array
+arr = list(map(int, input("Enter the elements of the array (separated by space): ").split()))
+
+quick_sort(arr, 0, len(arr) - 1)
+print("Sorted array:", arr)
+
+
+Quick sort and merge sort----------------------------------------
+ 
+ 
+ 
+ Database management: Sorting is a fundamental operation in database management systems.
+ Quick sort and merge sort are often used to sort large amounts of data efficiently, such as when indexing or querying a database.
+
+Image processing: Quick sort and merge sort are used in image processing to sort pixel values
+ and to perform histogram equalization, which is a technique used to enhance the contrast of an image.
+
+File systems: Sorting algorithms are used in file systems to organize and retrieve files efficiently. 
+Quick sort and merge sort are often used to sort directories and files in file systems.
+
+Genetics: Sorting algorithms are used in bioinformatics and genetics to analyze DNA sequences
+ and to identify patterns and mutations in genetic data.
+
+Natural language processing: Sorting algorithms are used in natural language processing to
+ sort and organize large amounts of text data efficiently.
+
+Search engines: Quick sort and merge sort are used in search engines to sort search 
+results based on relevance, page rank, or other criteria.
+
+Quick Sort:
+Best Case: The best case scenario for Quick Sort is when the partition process divides the array into two roughly equal halves. 
+In this case, the pivot element will always be the median, and the time complexity of the algorithm will be O(n log n).
+Worst Case: The worst case scenario for Quick Sort is when the partition process divides the array into two very unequal halves.
+ In this case, the pivot element will always be the smallest or largest element in the array, and the time complexity of the algorithm will be O(n^2).
+

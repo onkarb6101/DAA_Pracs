@@ -1,0 +1,258 @@
+Java
+
+public class NQueens {
+
+    private int[][] board;
+    private int n;
+
+    public NQueens(int n) {
+        this.board = new int[n][n];
+        this.n = n;
+    }
+
+    public boolean solve() {
+        return solve(0);
+    }
+
+    private boolean solve(int col) {
+        if (col >= n) {
+            return true;
+        }
+
+        for (int row = 0; row < n; row++) {
+            if (isSafe(row, col)) {
+                board[row][col] = 1;
+                if (solve(col + 1)) {
+                    return true;
+                }
+                board[row][col] = 0;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isSafe(int row, int col) {
+        for (int i = 0; i < col; i++) {
+            if (board[row][i] == 1) {
+                return false;
+            }
+        }
+
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1) {
+                return false;
+            }
+        }
+
+        for (int i = row, j = col; i < n && j >= 0; i++, j--) {
+            if (board[i][j] == 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void printSolution() {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+        NQueens queens = new NQueens(8);
+        if (queens.solve()) {
+            queens.printSolution();
+        } else {
+            System.out.println("No solution found.");
+        }
+    }
+}
+
+
+CPP
+
+#include<bits/stdc++.h>
+using namespace std;
+
+bool isSafe(int** arr,int x,int y,int n){
+
+    // column checking
+    for(int row = 0; row < x; row++){
+        if(arr[row][y]==1){
+            return false;
+        }
+    }
+
+    // diagonal checking
+    int row = x;
+    int col = y;
+    
+    // left diagonal
+    while(row>=0 && col>=0){
+        if(arr[row][col]==1){
+            return false;
+        }
+        row--;
+        col--;
+    }
+
+    // right diagonal
+    row = x;
+    col = y;
+    
+    while(row>=0 && col<n){
+        if(arr[row][col]==1){
+            return false;
+        }
+        row--;
+        col++;
+    }
+
+    return true;
+}
+
+bool NQueens(int** arr,int x,int n){
+
+    if(x>=n){
+        return true;
+    }
+
+    // check whether it is safe to place the queen
+
+    for(int col = 0; col < n; col++){
+        if(isSafe(arr,x,col,n)){
+            arr[x][col] = 1;
+
+            if(NQueens(arr,x+1,n)){
+                return true;
+            }
+
+            arr[x][col] = 0; // backtracking
+        }
+    }
+    return false;
+}
+
+int main(int argc, char **argv){
+    //type your code below
+    int n;
+    cout << "Enter a number to begin" << endl;
+    cin >> n;
+
+    // getting the matrix
+
+    int **arr = new int*[n];
+    for(int i = 0; i < n; i++){
+        arr[i] = new int[n];
+        for(int j = 0; j < n; j++){
+            arr[i][j] = 0; 
+        }
+    }
+
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    start = std::chrono::system_clock::now();    
+    if(NQueens(arr,0,n)){
+        for(int i=0;i < n;i++){
+            for(int j = 0;j < n;j++){
+                cout<<arr[i][j];
+            }cout<<endl;
+        }
+    }
+
+    end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+    std::cout << "finished computation at " << std::ctime(&end_time)
+                << "elapsed time: " << elapsed_seconds.count() << "s\n";    
+
+    return 0;
+}
+
+
+Python
+
+
+def is_safe(board, row, col):
+    # Check if there is any queen in the same column
+    for i in range(row):
+        if board[i][col] == 1:
+            return False
+
+    # Check if there is any queen in the upper left diagonal
+    i = row - 1
+    j = col - 1
+    while i >= 0 and j >= 0:
+        if board[i][j] == 1:
+            return False
+        i -= 1
+        j -= 1
+
+    # Check if there is any queen in the upper right diagonal
+    i = row - 1
+    j = col + 1
+    while i >= 0 and j < len(board):
+        if board[i][j] == 1:
+            return False
+        i -= 1
+        j += 1
+
+    return True
+
+
+def solve_queens(board, row):
+    if row == len(board):
+        # All queens have been placed successfully
+        return True
+
+    for col in range(len(board)):
+        if is_safe(board, row, col):
+            board[row][col] = 1
+            if solve_queens(board, row + 1):
+                return True
+            board[row][col] = 0
+
+    return False
+
+
+def print_board(board):
+    for row in board:
+        print(' '.join(map(str, row)))
+
+
+# User input for the size of the board
+size = int(input("Enter the size of the chessboard: "))
+
+# Initialize the board with all zeros
+board = [[0] * size for _ in range(size)]
+
+# Solve the N-Queens problem
+if solve_queens(board, 0):
+    print("Solution found:")
+    print_board(board)
+else:
+    print("No solution found.")
+
+
+
+ N-Queens---------------------------------------
+ The time complexity of the N-Queens problem is O(N!), where N is the size of the board.
+ This is because in the worst-case scenario, we need to consider all possible permutations of the N queens on the board, which is N! possibilities.
+ However, with the use of some heuristics and backtracking techniques, the actual running time can be significantly reduced.
+ 
+ Game playing: Backtracking is commonly used in game playing algorithms to search for the best possible move by exploring all possible moves and their consequences.
+
+Graph problems: Backtracking is used to solve problems on graphs like finding all possible paths between two nodes or finding the shortest path.
+
+Scheduling and Timetabling: The N-Queens problem can be seen as a scheduling or timetabling problem, where the queens represent tasks or events that need to be scheduled without any conflicts. Each row and column on the chessboard can represent different resources, time slots, or locations, and the placement of queens represents the assignment of tasks to these resources.
+
+Placement of Antennas or Sensors: In wireless communication or sensor network applications, the N-Queens problem can be used to determine the optimal placement of antennas or sensors in an area. The goal is to find a configuration that maximizes coverage while avoiding interference between the antennas or sensors.
+
+Sudoku and Latin Square Generation: The N-Queens problem can be generalized to other puzzle-solving problems such as Sudoku or Latin Square generation. By adapting the rules and constraints of the N-Queens problem, it is possible to generate Sudoku grids or Latin Squares that satisfy the desired properties.
+
+Graph Coloring: The N-Queens problem can be seen as a variant of the graph coloring problem. In graph coloring, the goal is to assign colors to the vertices of a graph such that no two adjacent vertices share the same color. By representing the graph as a chessboard, with queens representing the vertices, solving the N-Queens problem can yield a valid graph coloring solution.

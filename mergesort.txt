@@ -1,0 +1,98 @@
+
+#include<iostream>
+#include<chrono>
+using namespace std;
+void merge(int *arr,int low,int mid,int high){
+    int tmp[300];
+    int i=low,k=low,j=mid+1;
+    while (i<=mid and j<=high)
+    {
+        if(arr[i]<arr[j]){
+            tmp[k]=arr[i];
+            i++;
+            k++;
+        }
+        else{
+            tmp[k]=arr[j];
+             j++;
+             k++;
+        }
+    }
+    while(i<=mid){
+        tmp[k]=arr[i];
+       i++;
+       k++;
+    }
+    while(j<=high){
+        tmp[k]=arr[j];
+        k++;
+        j++;
+    }
+    for(int i=low;i<k;i++){
+        arr[i]=tmp[i];
+    }
+}
+void Mergesort(int *arr,int low,int high){
+    int mid;
+    if(low<high){
+            mid=(low+high)/2;
+            Mergesort(arr,low,mid);
+            Mergesort(arr,mid+1,high);
+            merge(arr,low,mid,high);
+    }
+
+}
+int main(){
+       cout<<"Enter number of elements to be sorted:";
+       int num;
+    cin>>num;
+    int arr[num];
+    cout<<"Enter "<<num<<" elements to be sorted:";
+    for (int i = 0; i < num; i++) { cin>>arr[i];
+    }
+  //  int start=clock();
+  auto start = chrono::high_resolution_clock::now();
+    Mergesort(arr, 0, num-1);
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration =chrono:: duration_cast<chrono::nanoseconds>(stop - start);
+   // int stop=clock();
+   cout<<"The duration is"<<duration.count()<<endl;
+    cout<<"Sorted array\n";
+    for (int i = 0; i < num; i++)
+    {
+        cout<<arr[i]<<"\t";
+    }   
+}
+
+
+Quick sort and merge sort----------------------------------------
+ 
+ 
+ 
+ Database management: Sorting is a fundamental operation in database management systems.
+ Quick sort and merge sort are often used to sort large amounts of data efficiently, such as when indexing or querying a database.
+
+Image processing: Quick sort and merge sort are used in image processing to sort pixel values
+ and to perform histogram equalization, which is a technique used to enhance the contrast of an image.
+
+File systems: Sorting algorithms are used in file systems to organize and retrieve files efficiently. 
+Quick sort and merge sort are often used to sort directories and files in file systems.
+
+Genetics: Sorting algorithms are used in bioinformatics and genetics to analyze DNA sequences
+ and to identify patterns and mutations in genetic data.
+
+Natural language processing: Sorting algorithms are used in natural language processing to
+ sort and organize large amounts of text data efficiently.
+
+Search engines: Quick sort and merge sort are used in search engines to sort search 
+results based on relevance, page rank, or other criteria.
+
+
+Merge Sort:
+Best Case: The best case scenario for Merge Sort is when the input array is already sorted.
+ In this case, the algorithm will simply divide the array into smaller sub-arrays and merge them back together, resulting in a time complexity of O(n log n).
+Worst Case: The worst case scenario for Merge Sort is when the input array is sorted in reverse order. 
+In this case, the algorithm will have to make the maximum number of comparisons and swaps, resulting in a time complexity of O(n log n).
+In summary, both Quick Sort and Merge Sort have a best case time complexity of O(n log n), 
+which is considered very efficient. However, Quick Sort has a worst case time complexity of O(n^2),
+ which can be a disadvantage in some cases. On the other hand, Merge Sort has a worst case time complexity of O(n log n), which is still very efficient.

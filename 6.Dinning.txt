@@ -1,0 +1,148 @@
+Java Infinite
+
+
+import java.util.concurrent.Semaphore;
+
+public class DiningPhilosophers {
+
+    public static void main(String[] args) {
+
+        int numberOfPhilosophers = 5;
+
+        PhilosopherSemaphore[] philosophers = new PhilosopherSemaphore[numberOfPhilosophers];
+        Semaphore[] chopsticks = new Semaphore[numberOfPhilosophers];
+
+        for (int i = 0; i < chopsticks.length; i++) {
+            // set second argument to true to enable fairness queueing
+            chopsticks[i] = new Semaphore(1, true);
+        }
+
+        for (int i = 0; i < numberOfPhilosophers; i++) {
+            Semaphore leftChopstick = chopsticks[i];
+            Semaphore rightChopstick = chopsticks[(i + 1) % numberOfPhilosophers];
+
+            if (i == 0) {
+                // first philosopher picks up right chopstick first to break
+                // circular wait condition and avoid deadlock
+                philosophers[i] = new PhilosopherSemaphore(rightChopstick, leftChopstick);
+            } else {
+                philosophers[i] = new PhilosopherSemaphore(leftChopstick, rightChopstick);
+            }
+
+            Thread t = new Thread(philosophers[i], "Philosopher " + (i + 1));
+            t.start();
+        }
+    }
+
+    public static class PhilosopherSemaphore implements Runnable {
+
+        private Semaphore leftChopstick;
+        private Semaphore rightChopstick;
+
+        public PhilosopherSemaphore(Semaphore leftChopstick, Semaphore rightChopstick) {
+            this.leftChopstick = leftChopstick;
+            this.rightChopstick = rightChopstick;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    System.out.println(Thread.currentThread().getName() + ": Thinking");
+
+                    leftChopstick.acquire();
+                    System.out.println(Thread.currentThread().getName() + ": Picked up left chopstick");
+
+                    rightChopstick.acquire();
+                    System.out.println(Thread.currentThread().getName() + ": Picked up right chopstick, eating...");
+                    Thread.sleep(((int) (Math.random() * 500)));
+
+                    rightChopstick.release();
+                    System.out.println(Thread.currentThread().getName() + ": Put down right chopstick");
+
+                    leftChopstick.release();
+                    System.out.println(Thread.currentThread().getName() + ": Put down left chopstick, thinking...");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+    }
+}
+
+
+CPP Finite 
+
+#include <bits/stdc++.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+using namespace std;
+
+#define N 5
+sem_t chopsticks[5];
+void* philos(void *);
+void eat(int);
+
+int main(int argc, char **argv){
+    int i,n[5];
+    pthread_t T[5];
+    for(i = 0; i < 5; i++){
+        sem_init(&chopsticks[i],0,1);
+    }
+    for(i = 0;i < 5; i++){
+        n[i] = i;
+        pthread_create(&T[i],NULL,philos,(void *)&n[i]);
+    }
+
+    for(i = 0;i < 5; i++){
+        pthread_join(T[i],NULL);
+    }
+}
+
+void *philos(void *n){
+    int ph = *(int *)n;
+    cout << "\nPhilosopher " << ph << " wants to eat" << endl;
+    cout << "\nPhilosopher " << ph << " tries to pick left chopstick" << endl;
+    sem_wait(&chopsticks[ph]);
+    cout << "\nPhilosopher " << ph << " picks left chopstick" << endl;
+    cout << "\nPhilosopher " << ph << " tries to pick right chopstick" << endl;
+    sem_wait(&chopsticks[(ph + 1)%5]);
+    cout << "\nPhilosopher " << ph << " picks right chopstick" << endl;
+    eat(ph);
+    sleep(2);
+    cout << "\nPhilosopher " << ph << " has done eating" << endl;
+    sem_post(&chopsticks[(ph + 1)%5]);
+    cout << "\nPhilosopher " << ph << " leaves the right chopsticks" << endl;
+    sem_post(&chopsticks[ph]);
+    cout << "\nPhilosopher " << ph << " leaves left chopsticks" << endl;
+    
+    return 0;
+}
+
+void eat(int ph){
+    cout << "\nPhilosopher " << ph << " is eating" << endl;
+}
+
+
+ dining philosopher problem ---------------------------------------
+ 
+ Resource allocation in operating systems: In operating systems, 
+ the Dining Philosophers Problem can be used to model the allocation of
+ resources such as CPU time, memory, and disk space. The problem
+ of resource allocation in operating systems is similar to the
+ Dining Philosophers Problem, in that multiple processes may require access to the same resource at the same time.
+
+Distributed computing: In distributed computing, the
+ Dining Philosophers Problem can be used to model the 
+ problem of deadlock and resource allocation in distributed systems.
+ The problem of resource allocation in distributed systems is similar
+ to the Dining Philosophers Problem, in that multiple nodes may require access to the same resource at the same time.
+
+Concurrent programming: In concurrent programming, the Dining
+ Philosophers Problem is a classic example of a synchronization problem.
+ The problem highlights the issues that can arise when multiple
+ threads or processes access shared resources simultaneously.
+
+Traffic Management and Intersection Control: The Dining Philosophers problem can be seen as an analogy to traffic management, specifically in scenarios where multiple vehicles need to navigate through an intersection. Just as philosophers need to coordinate their fork usage, vehicles need to navigate intersections efficiently, respecting traffic rules and avoiding gridlock situations.
